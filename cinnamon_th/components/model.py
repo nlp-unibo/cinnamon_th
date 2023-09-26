@@ -25,7 +25,6 @@ class THNetwork(Network):
             batch_x: Any,
             batch_y: Any,
             input_additional_info: Dict = {},
-            training: bool = False
     ) -> Tuple[Any, Any, Dict, Any, Dict]:
         """
         Computes model loss for given batch.
@@ -34,7 +33,6 @@ class THNetwork(Network):
             batch_x: batch input data in any model-compliant format
             batch_y: batch ground-truth data in any model-compliant format
             input_additional_info: additional input model data
-            training: whether the model is in training mode or not
 
         Returns:
             The computed loss information for the current step (e.g., losses name and value)
@@ -73,8 +71,7 @@ class THNetwork(Network):
             predictions, \
             model_additional_info = self.batch_loss(batch_x,
                                                     batch_y,
-                                                    input_additional_info=input_additional_info,
-                                                    training=True)
+                                                    input_additional_info=input_additional_info)
 
         loss.backward()
 
@@ -165,8 +162,7 @@ class THNetwork(Network):
             predictions, \
             model_additional_info = self.batch_loss(batch_x=batch_x,
                                                     batch_y=batch_y,
-                                                    input_additional_info=input_additional_info,
-                                                    training=False)
+                                                    input_additional_info=input_additional_info)
         loss_info['loss'] = true_loss
         return loss, true_loss, loss_info, predictions, model_additional_info
 
@@ -226,8 +222,8 @@ class THNetwork(Network):
 
         training_info = {}
 
-        self.model.train()
         for epoch in range(self.epochs):
+            self.model.train()
 
             if self.model.stop_training:
                 logging_utility.logger.info(f'Stopping training at epoch {epoch}')

@@ -1,6 +1,7 @@
 from typing import Optional, Dict
 
 import numpy as np
+import torch
 
 from cinnamon_core.utility import logging_utility
 from cinnamon_generic.components.callback import Callback
@@ -66,7 +67,7 @@ class THEarlyStopping(Callback):
             self.best_epoch = logs['epoch']
             self.wait = 0
             if self.restore_best_weights:
-                self.best_weights = self.component.model.get_weights()
+                self.best_weights = self.component.model.parameters()
         else:
             self.wait += 1
             if self.wait >= self.patience:
@@ -74,7 +75,8 @@ class THEarlyStopping(Callback):
                 self.component.model.stop_training = True
                 if self.restore_best_weights:
                     logging_utility.logger.info('Restoring model weights from the end of the best epoch.')
-                    self.component.model.set_weights(self.best_weights)
+                    with torch.no_grad():
+                        self.component.model.parameters = self.best_weights
 
     def on_fit_end(
             self,
