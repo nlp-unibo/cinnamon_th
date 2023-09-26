@@ -27,7 +27,7 @@ class THHelper(Helper):
     def limit_gpu_usage(self):
         # avoid other GPUs
         if self.limit_gpu_visibility:
-            os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(self.gpu_indexes)
+            os.environ['CUDA_VISIBLE_DEVICES'] = ','.join([str(idx) for idx in self.gpu_indexes])
 
     def run(
             self,
