@@ -8,6 +8,10 @@ from cinnamon_generic.components.helper import Helper
 
 
 class THHelper(Helper):
+    """
+    Torch specific backend helper.
+    `THHelper` controls deterministic behaviour and gpu visibility.
+    """
 
     def set_seed(
             self,

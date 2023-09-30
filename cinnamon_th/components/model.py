@@ -19,6 +19,17 @@ from cinnamon_generic.utility.printing_utility import prettify_statistics
 
 class THNetwork(Network):
 
+    def get_device(
+            self
+    ):
+        device = th.device('cuda' if th.cuda.is_available() else 'cpu')
+        return device
+
+    def input_additional_info(
+            self
+    ) -> Dict:
+        return {}
+
     @abc.abstractmethod
     def batch_loss(
             self,
@@ -244,11 +255,12 @@ class THNetwork(Network):
                         callbacks.run(hookpoint='on_batch_fit_begin',
                                       logs={'batch': batch_idx})
 
-                    input_additional_info = self.model.input_additional_info() \
-                        if hasattr(self.model, 'input_additional_info') else {}
-                    batch_info, _, model_additional_info = self.batch_fit(*next(data_iterator),
+                    input_additional_info = self.input_additional_info()
+                    batch_x, batch_y = next(data_iterator)
+                    batch_info, _, model_additional_info = self.batch_fit(batch_x=batch_x,
+                                                                          batch_y=batch_y,
                                                                           input_additional_info=input_additional_info)
-                    batch_info = {f'train_{key}': item.detach().numpy() for key, item in batch_info.items()}
+                    batch_info = {f'train_{key}': item.detach().cpu().numpy() for key, item in batch_info.items()}
 
                     if callbacks:
                         callbacks.run(hookpoint='on_batch_fit_end',
@@ -332,10 +344,9 @@ class THNetwork(Network):
                                     'suffixes': suffixes})
 
             batch_x, batch_y = next(data_iterator)
-            ground_truth.append(batch_y)
+            ground_truth.append(batch_y.detach().cpu().numpy())
 
-            input_additional_info = self.model.input_additional_info() \
-                if hasattr(self.model, 'input_additional_info') else {}
+            input_additional_info = self.input_additional_info()
             batch_loss, \
                 true_batch_loss, \
                 batch_loss_info, \
@@ -344,7 +355,7 @@ class THNetwork(Network):
                                                             batch_y=batch_y,
                                                             input_additional_info=input_additional_info)
 
-            batch_info = {key: item.detach().numpy() for key, item in batch_loss_info.items()}
+            batch_info = {key: item.detach().cpu().numpy() for key, item in batch_loss_info.items()}
 
             for key, item in batch_info.items():
                 loss[key] += item
@@ -420,14 +431,14 @@ class THNetwork(Network):
                               logs={'batch': batch_idx,
                                     'suffixes': suffixes})
 
-            input_additional_info = self.model.input_additional_info() \
-                if hasattr(self.model, 'input_additional_info') else {}
-            batch_predictions, model_additional_info = self.batch_predict(next(data_iterator),
+            input_additional_info = self.input_additional_info()
+            batch_x = next(data_iterator)
+            batch_predictions, model_additional_info = self.batch_predict(batch_x=batch_x,
                                                                           input_additional_info=input_additional_info)
             if model_processor is not None:
                 batch_predictions = model_processor.run(data=batch_predictions)
             else:
-                batch_predictions = batch_predictions.detach().numpy()
+                batch_predictions = batch_predictions.detach().cpu().numpy()
             predictions.extend(batch_predictions)
 
             if callbacks:

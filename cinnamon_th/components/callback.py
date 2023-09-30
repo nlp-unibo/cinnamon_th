@@ -8,6 +8,10 @@ from cinnamon_generic.components.callback import Callback
 
 
 class THEarlyStopping(Callback):
+    """
+    Early stopping callback.
+    Mainly inspired from the Keras implementation.
+    """
 
     def __init__(
             self,
@@ -91,6 +95,17 @@ class THEarlyStopping(Callback):
             self,
             logs: Optional[Dict] = None
     ):
+        """
+        Retrieves the early stopping metric value (i.e., `monitor`) based on the given configuration.
+        This method is invoked at the end of each epoch to decide whether to perform early stopping or not.
+
+        Args:
+            logs: A dictionary containing callback hookpoint information.
+
+        Returns:
+            The early stopping metric value
+        """
+
         logs = logs if logs is not None else {}
         monitor_value = logs.get(self.monitor)
         if monitor_value is None:
