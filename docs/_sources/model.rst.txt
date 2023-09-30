@@ -38,18 +38,11 @@ For instance, the following ``THTextTreeProcessor`` builds a ``torch.utils.data.
 .. code-block:: python
 
     import torch as th
-    from torchdata.datapipes.iter import IterableWrapper
+    from torchdata.datapipes.map import SequenceWrapper
     from torch.nn.utils.rnn import pad_sequence
     from torch.utils.data import DataLoader
 
     class THTextTreeProcessor(Processor):
-
-        def get_input_data(
-                self,
-                data: FieldDict
-        ):
-            for x, y in zip(data.x, data.y):
-                yield x, y
 
         def batch_data(
                 self,
@@ -61,7 +54,7 @@ For instance, the following ``THTextTreeProcessor`` builds a ``torch.utils.data.
                 y.append(item[1])
 
             x = pad_sequence(x, batch_first=True, padding_value=0)
-            y = th.tensor(y, dtype=th.int32)
+            y = th.tensor(y, dtype=th.long)
             return x, y
 
         def process(
@@ -69,12 +62,12 @@ For instance, the following ``THTextTreeProcessor`` builds a ``torch.utils.data.
                 data: FieldDict,
                 is_training_data: bool = False
         ) -> FieldDict:
-            th_data = IterableWrapper(partial(self.get_input_data, data=data)(), deepcopy=False)
+            x_th_data = SequenceWrapper(data.x)
+            y_th_data = SequenceWrapper(data.y)
+            th_data = x_th_data.zip(y_th_data)
 
             if is_training_data:
-                th_data = th_data.shuffle(buffer_size=self.buffer_size)
-
-            th_data = th_data.sharding_filter()
+                th_data = th_data.shuffle()
 
             th_data = DataLoader(th_data,
                                  shuffle=is_training_data,
@@ -86,5 +79,5 @@ For instance, the following ``THTextTreeProcessor`` builds a ``torch.utils.data.
 
             return FieldDict({'iterator': lambda: iter(th_data),
                               'input_iterator': lambda: iter(th_data.map(lambda x, y: x)),
-                              'output_iterator': lambda: iter(th_data.map(lambda x, y: y.numpy())),
+                              'output_iterator': lambda: iter(th_data.map(lambda x, y: y.detach().cpu().numpy())),
                               'steps': steps})

@@ -371,10 +371,22 @@ document.write(`
 <dt class="sig sig-object py" id="cinnamon_th.components.callback.THEarlyStopping">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cinnamon_th.components.callback.</span></span><span class="sig-name descname"><span class="pre">THEarlyStopping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cinnamon_th.components.callback.THEarlyStopping" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Callback</span></code></p>
+<p>Early stopping callback.
+Mainly inspired from the Keras implementation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cinnamon_th.components.callback.THEarlyStopping.get_monitor_value">
 <span class="sig-name descname"><span class="pre">get_monitor_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cinnamon_th.components.callback.THEarlyStopping.get_monitor_value" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Retrieves the early stopping metric value (i.e., <cite>monitor</cite>) based on the given configuration.
+This method is invoked at the end of each epoch to decide whether to perform early stopping or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>logs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]) – A dictionary containing callback hookpoint information.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The early stopping metric value</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cinnamon_th.components.callback.THEarlyStopping.on_epoch_end">
@@ -406,6 +418,8 @@ document.write(`
 <dt class="sig sig-object py" id="cinnamon_th.components.helper.THHelper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cinnamon_th.components.helper.</span></span><span class="sig-name descname"><span class="pre">THHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cinnamon_th.components.helper.THHelper" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Helper</span></code></p>
+<p>Torch specific backend helper.
+<cite>THHelper</cite> controls deterministic behaviour and gpu visibility.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cinnamon_th.components.helper.THHelper.clear">
 <span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cinnamon_th.components.helper.THHelper.clear" title="Permalink to this definition">#</a></dt>
@@ -508,7 +522,7 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cinnamon_th.components.model.THNetwork.batch_loss">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">batch_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_additional_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">training</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cinnamon_th.components.model.THNetwork.batch_loss" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">batch_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_additional_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cinnamon_th.components.model.THNetwork.batch_loss" title="Permalink to this definition">#</a></dt>
 <dd><p>Computes model loss for given batch.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -516,7 +530,6 @@ document.write(`
 <li><p><strong>batch_x</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – batch input data in any model-compliant format</p></li>
 <li><p><strong>batch_y</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>) – batch ground-truth data in any model-compliant format</p></li>
 <li><p><strong>input_additional_info</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>) – additional input model data</p></li>
-<li><p><strong>training</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – whether the model is in training mode or not</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -589,6 +602,21 @@ document.write(`
 <dt class="sig sig-object py" id="cinnamon_th.components.model.THNetwork.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cinnamon_th.components.model.THNetwork.fit" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cinnamon_th.components.model.THNetwork.get_device">
+<span class="sig-name descname"><span class="pre">get_device</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cinnamon_th.components.model.THNetwork.get_device" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cinnamon_th.components.model.THNetwork.input_additional_info">
+<span class="sig-name descname"><span class="pre">input_additional_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cinnamon_th.components.model.THNetwork.input_additional_info" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cinnamon_th.components.model.THNetwork.load_model">
@@ -703,6 +731,8 @@ document.write(`
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cinnamon_th.components.model.THNetwork.batch_train"><code class="docutils literal notranslate"><span class="pre">THNetwork.batch_train()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cinnamon_th.components.model.THNetwork.evaluate"><code class="docutils literal notranslate"><span class="pre">THNetwork.evaluate()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cinnamon_th.components.model.THNetwork.fit"><code class="docutils literal notranslate"><span class="pre">THNetwork.fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cinnamon_th.components.model.THNetwork.get_device"><code class="docutils literal notranslate"><span class="pre">THNetwork.get_device()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cinnamon_th.components.model.THNetwork.input_additional_info"><code class="docutils literal notranslate"><span class="pre">THNetwork.input_additional_info()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cinnamon_th.components.model.THNetwork.load_model"><code class="docutils literal notranslate"><span class="pre">THNetwork.load_model()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cinnamon_th.components.model.THNetwork.predict"><code class="docutils literal notranslate"><span class="pre">THNetwork.predict()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cinnamon_th.components.model.THNetwork.save_model"><code class="docutils literal notranslate"><span class="pre">THNetwork.save_model()</span></code></a></li>
