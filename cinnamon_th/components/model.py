@@ -363,7 +363,7 @@ class THNetwork(Network):
             if model_processor is not None:
                 batch_predictions = model_processor.run(data=batch_predictions)
             else:
-                batch_predictions = batch_predictions.detach().numpy()
+                batch_predictions = batch_predictions.detach().cpu().numpy()
 
             if callbacks:
                 callbacks.run(hookpoint='on_batch_evaluate_end',
