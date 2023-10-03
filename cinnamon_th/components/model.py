@@ -28,7 +28,7 @@ class THNetwork(Network):
 
     def accumulate(
             self,
-            accumulator : Dict,
+            accumulator: Dict,
             data: Union[th.Tensor, Dict]
     ):
         if isinstance(data, th.Tensor):
@@ -378,6 +378,8 @@ class THNetwork(Network):
             if model_processor is not None:
                 batch_predictions = model_processor.run(data=batch_predictions)
 
+            predictions = self.accumulate(accumulator=predictions, data=batch_predictions)
+
             if callbacks:
                 callbacks.run(hookpoint='on_batch_evaluate_end',
                               logs={'batch': batch_idx,
@@ -388,8 +390,6 @@ class THNetwork(Network):
                                     'batch_y': batch_y,
                                     'model_additional_info': model_additional_info,
                                     'suffixes': suffixes})
-
-            predictions = self.accumulate(accumulator=predictions, data=batch_predictions)
 
         loss = {key: item / data.steps for key, item in loss.items()}
 
