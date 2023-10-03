@@ -29,10 +29,11 @@ class THNetwork(Network):
     def accumulate(
             self,
             accumulator: Dict,
-            data: Union[th.Tensor, Dict]
+            data: Union[th.Tensor, Dict],
+            default_name: str
     ):
         if isinstance(data, th.Tensor):
-            accumulator.setdefault('ground_truth', []).append(data.detach().cpu().numpy())
+            accumulator.setdefault(default_name, []).append(data.detach().cpu().numpy())
         else:
             for key, value in data.items():
                 accumulator.setdefault(key, []).append(value.detach().cpu().numpy())
@@ -359,7 +360,7 @@ class THNetwork(Network):
 
             batch_x, batch_y = next(data_iterator)
 
-            ground_truth = self.accumulate(accumulator=ground_truth, data=batch_y)
+            ground_truth = self.accumulate(accumulator=ground_truth, data=batch_y, default_name='ground_truth')
 
             input_additional_info = self.input_additional_info()
             batch_loss, \
@@ -378,7 +379,7 @@ class THNetwork(Network):
             if model_processor is not None:
                 batch_predictions = model_processor.run(data=batch_predictions)
 
-            predictions = self.accumulate(accumulator=predictions, data=batch_predictions)
+            predictions = self.accumulate(accumulator=predictions, data=batch_predictions, default_name='predictions')
 
             if callbacks:
                 callbacks.run(hookpoint='on_batch_evaluate_end',
@@ -449,7 +450,7 @@ class THNetwork(Network):
             if model_processor is not None:
                 batch_predictions = model_processor.run(data=batch_predictions)
 
-            predictions = self.accumulate(accumulator=predictions, data=batch_predictions)
+            predictions = self.accumulate(accumulator=predictions, data=batch_predictions, default_name='predictions')
 
             if callbacks:
                 callbacks.run(hookpoint='on_batch_predict_end',
@@ -463,7 +464,7 @@ class THNetwork(Network):
         else:
             ground_truth = {}
             for batch_y in data.output_iterator():
-                ground_truth = self.accumulate(accumulator=ground_truth, data=batch_y)
+                ground_truth = self.accumulate(accumulator=ground_truth, data=batch_y, default_name='ground_truth')
 
             metrics_info = metrics.run(y_pred=predictions, y_true=ground_truth, as_dict=True)
 
