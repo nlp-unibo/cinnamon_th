@@ -219,6 +219,7 @@ class THNetwork(Network):
 
         if self.model is not None:
             self.model.load_state_dict(th.load(filepath.joinpath('weights.pkl')))
+        return self.model
 
     @guard()
     def fit(
