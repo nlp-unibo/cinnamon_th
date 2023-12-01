@@ -298,7 +298,7 @@ class THNetwork(Network):
                                          callbacks=callbacks,
                                          metrics=metrics,
                                          model_processor=model_processor,
-                                         suffixes={'status': 'training'})
+                                         suffixes={'status': 'training', 'split': 'val'})
                 val_info = val_info.to_value_dict()
 
                 del val_info['predictions']
@@ -352,7 +352,9 @@ class THNetwork(Network):
         ground_truth = {}
 
         self.model.eval()
-        for batch_idx in tqdm(range(data.steps), leave=True, position=0, desc='Evaluating'):
+
+        tqdm_desc = f'Evaluation - {suffixes["split"]}' if suffixes is not None and 'split' in suffixes else 'Evaluation'
+        for batch_idx in tqdm(range(data.steps), leave=True, position=0, desc=tqdm_desc):
 
             if callbacks:
                 callbacks.run(hookpoint='on_batch_evaluate_begin',
@@ -437,7 +439,9 @@ class THNetwork(Network):
         data_iterator: Iterator = data.input_iterator() if 'input_iterator' in data else data.iterator()
 
         self.model.eval()
-        for batch_idx in tqdm(range(data.steps), leave=True, position=0, desc='Predicting'):
+
+        tqdm_desc = f'Predicting - {suffixes["split"]}' if suffixes is not None and 'split' in suffixes else 'Predicting'
+        for batch_idx in tqdm(range(data.steps), leave=True, position=0, desc=tqdm_desc):
 
             if callbacks:
                 callbacks.run(hookpoint='on_batch_predict_begin',
