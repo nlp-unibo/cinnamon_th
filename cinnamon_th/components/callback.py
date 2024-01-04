@@ -59,6 +59,12 @@ class THEarlyStopping(Callback):
         # Allow instances to be re-used
         self.reset()
 
+    def restore_weights(
+            self
+    ):
+        with torch.no_grad():
+            self.component.model.parameters = self.best_weights
+
     def on_epoch_end(
             self,
             logs: Optional[Dict] = None
@@ -79,8 +85,7 @@ class THEarlyStopping(Callback):
                 self.component.model.stop_training = True
                 if self.restore_best_weights:
                     logging_utility.logger.info('Restoring model weights from the end of the best epoch.')
-                    with torch.no_grad():
-                        self.component.model.parameters = self.best_weights
+                    self.restore_weights()
 
     def on_fit_end(
             self,
@@ -88,6 +93,9 @@ class THEarlyStopping(Callback):
     ):
         if self.stopped_epoch > 0:
             logging_utility.logger.info(f'Early stopping best epoch: {self.best_epoch}')
+
+        if self.restore_best_weights and self.best_weights is not None:
+            self.restore_weights()
 
         self.reset()
 
